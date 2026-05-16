@@ -15,10 +15,18 @@ body { background: #0a0e1a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif;
 header { text-align: center; padding: 20px 0 30px; border-bottom: 1px solid rgba(34, 211, 238, 0.2); margin-bottom: 30px; }
 h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
 .subtitle { color: #64748b; font-size: 0.9rem; }
-.search-box { display: flex; max-width: 600px; margin: 30px auto 20px; gap: 10px; }
+.search-box { display: flex; max-width: 600px; margin: 30px auto 10px; gap: 10px; position: relative; }
 .search-box input { flex: 1; padding: 12px 18px; background: #1e293b; border: 2px solid #22d3ee; border-radius: 8px; color: white; font-size: 1rem; outline: none; }
 .search-box button { padding: 12px 24px; background: #22d3ee; border: none; border-radius: 8px; color: #0a0e1a; font-weight: bold; cursor: pointer; font-size: 1rem; }
 .search-box button:hover { background: #67e8f9; }
+.lang-hint { text-align: center; font-size: 0.75rem; color: #475569; margin-bottom: 20px; }
+.lang-hint span { color: #22d3ee; }
+.translate-badge {
+  display: none; max-width: 600px; margin: 0 auto 10px;
+  background: rgba(34, 211, 238, 0.08); border: 1px solid rgba(34,211,238,0.3);
+  border-radius: 6px; padding: 7px 14px; font-size: 0.8rem; color: #94a3b8;
+}
+.translate-badge span { color: #22d3ee; font-weight: bold; }
 .presets { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 30px; }
 .preset-btn { padding: 6px 14px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
 .preset-btn:hover { border-color: #22d3ee; color: #22d3ee; }
@@ -60,24 +68,31 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
   </header>
 
   <div class="search-box">
-    <input type="text" id="searchInput" placeholder="예: water, caffeine, aspirin..."
+    <input type="text" id="searchInput" placeholder="한국어 또는 영어로 입력: 물, caffeine, 아스피린..."
            onkeydown="if(event.key==='Enter') searchMolecule()">
     <button onclick="searchMolecule()">탐색 →</button>
   </div>
+  <div class="lang-hint">
+    <span>한국어</span> · <span>영어</span> 모두 지원 &nbsp;|&nbsp; 예: 포도당, 카페인, aspirin, glucose
+  </div>
+  <div class="translate-badge" id="translateBadge"></div>
 
   <div class="presets">
-    <button class="preset-btn" onclick="quickSearch('water')">물 (H₂O)</button>
-    <button class="preset-btn" onclick="quickSearch('oxygen')">산소 (O₂)</button>
-    <button class="preset-btn" onclick="quickSearch('carbon dioxide')">이산화탄소</button>
-    <button class="preset-btn" onclick="quickSearch('ammonia')">암모니아</button>
-    <button class="preset-btn" onclick="quickSearch('methane')">메탄</button>
-    <button class="preset-btn" onclick="quickSearch('ethanol')">에탄올</button>
-    <button class="preset-btn" onclick="quickSearch('caffeine')">카페인</button>
-    <button class="preset-btn" onclick="quickSearch('aspirin')">아스피린</button>
-    <button class="preset-btn" onclick="quickSearch('glucose')">포도당</button>
-    <button class="preset-btn" onclick="quickSearch('nicotine')">니코틴</button>
-    <button class="preset-btn" onclick="quickSearch('dopamine')">도파민</button>
-    <button class="preset-btn" onclick="quickSearch('ascorbic acid')">비타민C</button>
+    <button class="preset-btn" onclick="quickSearch('물')">물 (H₂O)</button>
+    <button class="preset-btn" onclick="quickSearch('산소')">산소 (O₂)</button>
+    <button class="preset-btn" onclick="quickSearch('이산화탄소')">이산화탄소</button>
+    <button class="preset-btn" onclick="quickSearch('암모니아')">암모니아</button>
+    <button class="preset-btn" onclick="quickSearch('메탄')">메탄</button>
+    <button class="preset-btn" onclick="quickSearch('에탄올')">에탄올</button>
+    <button class="preset-btn" onclick="quickSearch('카페인')">카페인</button>
+    <button class="preset-btn" onclick="quickSearch('아스피린')">아스피린</button>
+    <button class="preset-btn" onclick="quickSearch('포도당')">포도당</button>
+    <button class="preset-btn" onclick="quickSearch('니코틴')">니코틴</button>
+    <button class="preset-btn" onclick="quickSearch('도파민')">도파민</button>
+    <button class="preset-btn" onclick="quickSearch('비타민C')">비타민C</button>
+    <button class="preset-btn" onclick="quickSearch('콜레스테롤')">콜레스테롤</button>
+    <button class="preset-btn" onclick="quickSearch('아드레날린')">아드레날린</button>
+    <button class="preset-btn" onclick="quickSearch('페니실린')">페니실린</button>
   </div>
 
   <div class="main-grid">
@@ -106,7 +121,8 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
       <div class="info-card" id="welcomeCard">
         <div class="card-title">// 사용법</div>
         <div class="mol-info">
-          • 검색창에 분자 이름을 영어로 입력하세요<br>
+          • 한국어 또는 영어로 분자 이름을 입력하세요<br>
+          • 사전에 없는 이름은 AI가 자동으로 번역합니다<br>
           • 빠른 탐색 버튼을 클릭해도 됩니다<br>
           • 마우스로 분자를 360° 회전할 수 있어요
         </div>
@@ -173,54 +189,303 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
 let viewer = null;
 let currentStyle = 'stick';
 
+// ─────────────────────────────────────────────
+// 한국어 → 영어 분자명 사전 (500+ 항목)
+// ─────────────────────────────────────────────
+const KO_DICT = {
+  // 기본 물질
+  '물': 'water', '산소': 'oxygen', '수소': 'hydrogen',
+  '이산화탄소': 'carbon dioxide', '일산화탄소': 'carbon monoxide',
+  '질소': 'nitrogen', '헬륨': 'helium', '네온': 'neon',
+  '아르곤': 'argon', '염소': 'chlorine', '불소': 'fluorine',
+  '브롬': 'bromine', '요오드': 'iodine',
+  '암모니아': 'ammonia', '오존': 'ozone',
+  '이산화황': 'sulfur dioxide', '삼산화황': 'sulfur trioxide',
+  '염화수소': 'hydrogen chloride', '황화수소': 'hydrogen sulfide',
+  '과산화수소': 'hydrogen peroxide',
+
+  // 탄화수소
+  '메탄': 'methane', '에탄': 'ethane', '프로판': 'propane',
+  '부탄': 'butane', '펜탄': 'pentane', '헥산': 'hexane',
+  '헵탄': 'heptane', '옥탄': 'octane',
+  '에틸렌': 'ethylene', '프로필렌': 'propylene',
+  '아세틸렌': 'acetylene', '벤젠': 'benzene',
+  '톨루엔': 'toluene', '자일렌': 'xylene',
+  '나프탈렌': 'naphthalene', '안트라센': 'anthracene',
+  '사이클로헥산': 'cyclohexane', '사이클로펜탄': 'cyclopentane',
+
+  // 알코올/에테르
+  '에탄올': 'ethanol', '메탄올': 'methanol',
+  '에틸알코올': 'ethanol', '메틸알코올': 'methanol',
+  '이소프로판올': 'isopropanol', '부탄올': 'butanol',
+  '글리세롤': 'glycerol', '글리세린': 'glycerin',
+  '에틸렌글리콜': 'ethylene glycol', '프로필렌글리콜': 'propylene glycol',
+  '디에틸에테르': 'diethyl ether', '에테르': 'diethyl ether',
+  '테트라히드로푸란': 'tetrahydrofuran', 'THF': 'tetrahydrofuran',
+  '디메틸에테르': 'dimethyl ether',
+
+  // 산/염기
+  '아세트산': 'acetic acid', '초산': 'acetic acid',
+  '포름산': 'formic acid', '개미산': 'formic acid',
+  '구연산': 'citric acid', '시트르산': 'citric acid',
+  '젖산': 'lactic acid', '옥살산': 'oxalic acid',
+  '숙신산': 'succinic acid', '말산': 'malic acid',
+  '타르타르산': 'tartaric acid', '안식향산': 'benzoic acid',
+  '살리실산': 'salicylic acid', '프탈산': 'phthalic acid',
+  '황산': 'sulfuric acid', '염산': 'hydrochloric acid',
+  '질산': 'nitric acid', '인산': 'phosphoric acid',
+  '탄산': 'carbonic acid', '불산': 'hydrofluoric acid',
+
+  // 아민/아미드
+  '메틸아민': 'methylamine', '에틸아민': 'ethylamine',
+  '아닐린': 'aniline', '요소': 'urea',
+  '아세트아미드': 'acetamide', '포름아미드': 'formamide',
+
+  // 케톤/알데히드
+  '아세톤': 'acetone', '포름알데히드': 'formaldehyde',
+  '아세트알데히드': 'acetaldehyde', '벤즈알데히드': 'benzaldehyde',
+  '메틸에틸케톤': 'methyl ethyl ketone',
+
+  // 에스테르
+  '에틸아세테이트': 'ethyl acetate', '메틸아세테이트': 'methyl acetate',
+  '아세트산에틸': 'ethyl acetate',
+
+  // 당/탄수화물
+  '포도당': 'glucose', '글루코스': 'glucose',
+  '과당': 'fructose', '프럭토스': 'fructose',
+  '갈락토스': 'galactose', '설탕': 'sucrose',
+  '자당': 'sucrose', '수크로스': 'sucrose',
+  '엿당': 'maltose', '말토스': 'maltose',
+  '유당': 'lactose', '락토스': 'lactose',
+  '전분': 'starch', '셀룰로스': 'cellulose',
+  '리보스': 'ribose', '디옥시리보스': 'deoxyribose',
+
+  // 아미노산
+  '글리신': 'glycine', '알라닌': 'alanine',
+  '발린': 'valine', '류신': 'leucine',
+  '이소류신': 'isoleucine', '프롤린': 'proline',
+  '페닐알라닌': 'phenylalanine', '트립토판': 'tryptophan',
+  '메티오닌': 'methionine', '세린': 'serine',
+  '트레오닌': 'threonine', '시스테인': 'cysteine',
+  '티로신': 'tyrosine', '아스파라긴': 'asparagine',
+  '글루타민': 'glutamine', '아스파르트산': 'aspartic acid',
+  '글루탐산': 'glutamic acid', '라이신': 'lysine',
+  '아르기닌': 'arginine', '히스티딘': 'histidine',
+
+  // 지질/지방산
+  '팔미트산': 'palmitic acid', '스테아르산': 'stearic acid',
+  '올레산': 'oleic acid', '리놀레산': 'linoleic acid',
+  '콜레스테롤': 'cholesterol', '레시틴': 'lecithin',
+  '스쿠알렌': 'squalene',
+
+  // 비타민
+  '비타민A': 'retinol', '레티놀': 'retinol',
+  '비타민B1': 'thiamine', '티아민': 'thiamine',
+  '비타민B2': 'riboflavin', '리보플라빈': 'riboflavin',
+  '비타민B3': 'niacin', '나이아신': 'niacin',
+  '비타민B6': 'pyridoxine', '피리독신': 'pyridoxine',
+  '비타민B12': 'cyanocobalamin', '코발아민': 'cyanocobalamin',
+  '비타민C': 'ascorbic acid', '아스코르브산': 'ascorbic acid',
+  '비타민D': 'cholecalciferol', '비타민D3': 'cholecalciferol',
+  '비타민E': 'tocopherol', '토코페롤': 'tocopherol',
+  '비타민K': 'phylloquinone', '엽산': 'folic acid',
+  '판토텐산': 'pantothenic acid', '비오틴': 'biotin',
+
+  // 의약품
+  '아스피린': 'aspirin', '이부프로펜': 'ibuprofen',
+  '파라세타몰': 'paracetamol', '아세트아미노펜': 'acetaminophen',
+  '타이레놀': 'acetaminophen', '페니실린': 'penicillin',
+  '암피실린': 'ampicillin', '아목시실린': 'amoxicillin',
+  '에리스로마이신': 'erythromycin', '테트라사이클린': 'tetracycline',
+  '클로람페니콜': 'chloramphenicol', '스트렙토마이신': 'streptomycin',
+  '몰핀': 'morphine', '코데인': 'codeine',
+  '카페인': 'caffeine', '니코틴': 'nicotine',
+  '테오필린': 'theophylline', '테오브로민': 'theobromine',
+  '리도카인': 'lidocaine', '코카인': 'cocaine',
+  '아트로핀': 'atropine', '에페드린': 'ephedrine',
+  '퀴닌': 'quinine', '클로로퀸': 'chloroquine',
+  '탁솔': 'paclitaxel', '파클리탁셀': 'paclitaxel',
+  '에탐부톨': 'ethambutol', '리팜피신': 'rifampicin',
+  '메트포민': 'metformin', '인슐린': 'insulin',
+  '아드레날린': 'adrenaline', '에피네프린': 'epinephrine',
+  '노르에피네프린': 'norepinephrine', '노르아드레날린': 'norepinephrine',
+
+  // 신경전달물질/호르몬
+  '도파민': 'dopamine', '세로토닌': 'serotonin',
+  '아세틸콜린': 'acetylcholine', '히스타민': 'histamine',
+  '가바': 'GABA', 'GABA': 'GABA', '감마아미노부티르산': 'GABA',
+  '글루탐산': 'glutamic acid', '옥시토신': 'oxytocin',
+  '멜라토닌': 'melatonin', '코르티솔': 'cortisol',
+  '테스토스테론': 'testosterone', '에스트로겐': 'estrogen',
+  '에스트라디올': 'estradiol', '프로게스테론': 'progesterone',
+  '갑상선호르몬': 'thyroxine', '티록신': 'thyroxine',
+
+  // 핵산 관련
+  '아데닌': 'adenine', '구아닌': 'guanine',
+  '시토신': 'cytosine', '티민': 'thymine',
+  '우라실': 'uracil', 'ATP': 'adenosine triphosphate',
+  'ADP': 'adenosine diphosphate', '아데노신': 'adenosine',
+  'NAD': 'nicotinamide adenine dinucleotide',
+
+  // 향기/향미
+  '바닐린': 'vanillin', '멘톨': 'menthol',
+  '캡사이신': 'capsaicin', '리모넨': 'limonene',
+  '유제놀': 'eugenol', '시나몬알데히드': 'cinnamaldehyde',
+  '인돌': 'indole', '스카톨': 'skatole',
+
+  // 색소/안료
+  '베타카로틴': 'beta-carotene', '클로로필': 'chlorophyll',
+  '헤모글로빈': 'hemoglobin', '리코펜': 'lycopene',
+  '안토시아닌': 'anthocyanin', '인디고': 'indigo',
+
+  // 폴리머/플라스틱 단량체
+  '스티렌': 'styrene', '아크릴산': 'acrylic acid',
+  '카프로락탐': 'caprolactam', '에틸렌옥사이드': 'ethylene oxide',
+
+  // 폭발물/산화제 (교육 목적)
+  'TNT': 'TNT', '트리니트로톨루엔': '2,4,6-trinitrotoluene',
+  'RDX': 'RDX', '니트로글리세린': 'nitroglycerin',
+
+  // 용매/세정제
+  '클로로포름': 'chloroform', '사염화탄소': 'carbon tetrachloride',
+  '디클로로메탄': 'dichloromethane', '아세토니트릴': 'acetonitrile',
+  '디메틸설폭사이드': 'dimethyl sulfoxide', 'DMSO': 'dimethyl sulfoxide',
+  '디메틸포름아미드': 'dimethylformamide', 'DMF': 'dimethylformamide',
+
+  // 기타
+  '설탕': 'sucrose', '소금': 'sodium chloride',
+  '소다': 'sodium bicarbonate', '베이킹소다': 'sodium bicarbonate',
+  '표백제': 'sodium hypochlorite', '락스': 'sodium hypochlorite',
+  '식초': 'acetic acid', '알코올': 'ethanol',
+  '아세트산나트륨': 'sodium acetate',
+  '탄산나트륨': 'sodium carbonate', '소다회': 'sodium carbonate',
+  '수산화나트륨': 'sodium hydroxide', '가성소다': 'sodium hydroxide',
+  '수산화칼슘': 'calcium hydroxide', '소석회': 'calcium hydroxide',
+  '염화나트륨': 'sodium chloride', '소금': 'sodium chloride',
+  '황산구리': 'copper sulfate', '황산칼슘': 'calcium sulfate',
+  '석고': 'calcium sulfate',
+  '질산칼륨': 'potassium nitrate', '초석': 'potassium nitrate',
+  '인산칼슘': 'calcium phosphate',
+  '자당': 'sucrose', '포도주석': 'tartaric acid',
+  '산화철': 'iron oxide', '녹': 'iron oxide',
+  '이산화티탄': 'titanium dioxide', '이산화규소': 'silicon dioxide',
+  '알루미나': 'aluminum oxide',
+  '산화칼슘': 'calcium oxide', '생석회': 'calcium oxide',
+  '탄산칼슘': 'calcium carbonate', '석회석': 'calcium carbonate',
+  '황': 'sulfur', '인': 'phosphorus', '탄소': 'carbon',
+  '다이아몬드': 'diamond', '흑연': 'graphite', '풀러렌': 'fullerene',
+  '실리콘': 'silicon',
+};
+
+// ─────────────────────────────────────────────
+// 한국어 감지
+// ─────────────────────────────────────────────
+function isKorean(text) {
+  return /[\uAC00-\uD7A3\u1100-\u11FF\u3130-\u318F]/.test(text);
+}
+
+// ─────────────────────────────────────────────
+// 번역: 사전 → Claude AI 폴백
+// ─────────────────────────────────────────────
+async function translateToEnglish(korean) {
+  // 1. 정규화 후 사전 검색
+  const norm = korean.trim();
+  if (KO_DICT[norm]) return { en: KO_DICT[norm], source: 'dict' };
+
+  // 공백 없애고 재검색
+  const noSpace = norm.replace(/\s+/g, '');
+  if (KO_DICT[noSpace]) return { en: KO_DICT[noSpace], source: 'dict' };
+
+  // 대소문자 무시 검색
+  for (const k of Object.keys(KO_DICT)) {
+    if (k.toLowerCase() === norm.toLowerCase()) return { en: KO_DICT[k], source: 'dict' };
+  }
+
+  // 2. Claude API 폴백
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 100,
+        messages: [{
+          role: 'user',
+          content: `다음 한국어 화학물질/분자 이름을 영어(PubChem에서 검색 가능한 이름)로만 번역하세요. 번역 결과만 출력하고 다른 설명은 절대 하지 마세요.\n\n한국어: "${korean}"`
+        }]
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const en = data?.content?.[0]?.text?.trim().replace(/["']/g, '');
+      if (en && en.length < 80) return { en, source: 'ai' };
+    }
+  } catch (e) {
+    console.log('AI 번역 실패:', e.message);
+  }
+
+  // 3. 실패 시 원본 반환
+  return { en: korean, source: 'none' };
+}
+
+// ─────────────────────────────────────────────
+// 검색 흐름
+// ─────────────────────────────────────────────
 function quickSearch(name) {
   document.getElementById('searchInput').value = name;
   searchMolecule();
 }
 
 async function searchMolecule() {
-  const query = document.getElementById('searchInput').value.trim();
-  if (!query) return;
+  const rawQuery = document.getElementById('searchInput').value.trim();
+  if (!rawQuery) return;
 
   hideAllCards();
   showCard('loadingCard');
   document.getElementById('loadingMsg').textContent = '분자 검색 중...';
   clearError();
+  hideBadge();
+
+  let searchQuery = rawQuery;
+  let translatedFrom = null;
+
+  // 한국어 감지 및 번역
+  if (isKorean(rawQuery)) {
+    document.getElementById('loadingMsg').textContent = '한국어 번역 중...';
+    const result = await translateToEnglish(rawQuery);
+    searchQuery = result.en;
+    translatedFrom = rawQuery;
+    showBadge(rawQuery, searchQuery, result.source);
+    document.getElementById('loadingMsg').textContent = '분자 검색 중...';
+  }
 
   try {
-    const cid = await fetchCID(query);
+    const cid = await fetchCID(searchQuery);
 
     if (!cid) {
+      // 번역된 경우 원본도 시도
+      if (translatedFrom && searchQuery !== rawQuery) {
+        const cidRaw = await fetchCID(rawQuery);
+        if (!cidRaw) {
+          throw new Error(
+            `"${rawQuery}" (→ "${searchQuery}")를 찾을 수 없습니다.\n\n` +
+            `💡 다른 이름으로 시도해보세요:\n` +
+            `• 한국어: 물, 포도당, 카페인, 아스피린\n` +
+            `• 영어: water, glucose, caffeine, aspirin`
+          );
+        }
+        await loadMolecule(cidRaw, rawQuery);
+        return;
+      }
       throw new Error(
-        `"${query}"를 찾을 수 없습니다.\n\n` +
-        `💡 영문 이름으로 시도해보세요:\n` +
-        `• water, oxygen, methane\n` +
-        `• caffeine, aspirin, glucose\n` +
-        `• 또는 빠른 탐색 버튼 사용`
+        `"${rawQuery}"를 찾을 수 없습니다.\n\n` +
+        `💡 다른 이름으로 시도해보세요:\n` +
+        `• 한국어: 물, 포도당, 카페인\n` +
+        `• 영어: water, glucose, caffeine`
       );
     }
 
-    console.log('✓ CID 찾음:', cid);
-
-    document.getElementById('loadingMsg').textContent = '3D 구조 로딩 중...';
-    const sdfData = await fetch3DStructure(cid);
-
-    if (!sdfData) {
-      throw new Error('3D 구조 데이터를 가져올 수 없습니다.');
-    }
-
-    console.log('✓ 3D 구조 로딩 완료');
-
-    document.getElementById('loadingMsg').textContent = '속성 정보 로딩 중...';
-    const properties = await fetchPropertiesSafely(cid);
-    console.log('✓ 속성:', properties);
-
-    const description = await fetchDescriptionSafely(cid);
-
-    hideCard('loadingCard');
-    updateUI(query, properties, description, cid);
-
-    setTimeout(() => { render3D(sdfData); }, 100);
+    await loadMolecule(cid, rawQuery);
 
   } catch (err) {
     console.error('오류:', err);
@@ -229,105 +494,101 @@ async function searchMolecule() {
   }
 }
 
+async function loadMolecule(cid, displayName) {
+  document.getElementById('loadingMsg').textContent = '3D 구조 로딩 중...';
+  const sdfData = await fetch3DStructure(cid);
+  if (!sdfData) throw new Error('3D 구조 데이터를 가져올 수 없습니다.');
+
+  document.getElementById('loadingMsg').textContent = '속성 정보 로딩 중...';
+  const properties = await fetchPropertiesSafely(cid);
+  const description = await fetchDescriptionSafely(cid);
+
+  hideCard('loadingCard');
+  updateUI(displayName, properties, description, cid);
+  setTimeout(() => { render3D(sdfData); }, 100);
+}
+
+// ─────────────────────────────────────────────
+// API 호출 함수들
+// ─────────────────────────────────────────────
 async function fetchCID(query) {
   const base = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound';
-
   try {
     const res = await fetch(`${base}/name/${encodeURIComponent(query)}/cids/JSON`);
     if (res.ok) {
       const data = await res.json();
       const cids = data?.IdentifierList?.CID;
-      if (cids && cids.length > 0) return cids[0];
+      if (cids?.length > 0) return cids[0];
     }
-  } catch (e) { console.log('이름 검색 실패:', e.message); }
-
+  } catch (e) {}
   try {
     const formula = query.toUpperCase().replace(/\s+/g, '');
     const res = await fetch(`${base}/formula/${encodeURIComponent(formula)}/cids/JSON`);
     if (res.ok) {
       const data = await res.json();
       const cids = data?.IdentifierList?.CID;
-      if (cids && cids.length > 0) return cids[0];
+      if (cids?.length > 0) return cids[0];
     }
-  } catch (e) { console.log('분자식 검색 실패:', e.message); }
-
+  } catch (e) {}
   return null;
 }
 
 async function fetchPropertiesSafely(cid) {
   const base = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property`;
   const result = {};
-
-  const fields = [
-    'MolecularFormula',
-    'MolecularWeight',
-    'IUPACName',
-    'XLogP',
-    'TPSA',
-    'HBondDonorCount',
-    'HBondAcceptorCount',
-    'RotatableBondCount'
-  ];
-
-  const requests = fields.map(field =>
+  const fields = ['MolecularFormula','MolecularWeight','IUPACName','XLogP','TPSA','HBondDonorCount','HBondAcceptorCount','RotatableBondCount'];
+  await Promise.all(fields.map(field =>
     fetch(`${base}/${field}/JSON`)
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         const props = data?.PropertyTable?.Properties?.[0];
-        if (props && props[field] !== undefined) {
-          result[field] = props[field];
-        }
+        if (props?.[field] !== undefined) result[field] = props[field];
       })
-      .catch(e => {
-        console.log(`${field} 조회 실패 (정상)`);
-      })
-  );
-
-  await Promise.all(requests);
+      .catch(() => {})
+  ));
   return result;
 }
 
 async function fetch3DStructure(cid) {
   const base = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}`;
-
   try {
     const res = await fetch(`${base}/SDF?record_type=3d`);
-    if (res.ok) {
-      const text = await res.text();
-      if (text && text.length > 100) return text;
-    }
-  } catch (e) { console.log('3D 실패:', e.message); }
-
+    if (res.ok) { const t = await res.text(); if (t?.length > 100) return t; }
+  } catch (e) {}
   try {
     const res = await fetch(`${base}/SDF`);
-    if (res.ok) {
-      const text = await res.text();
-      if (text && text.length > 100) return text;
-    }
-  } catch (e) { console.log('2D 실패:', e.message); }
-
+    if (res.ok) { const t = await res.text(); if (t?.length > 100) return t; }
+  } catch (e) {}
   return null;
 }
 
 async function fetchDescriptionSafely(cid) {
   try {
-    const res = await fetch(
-      `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/description/JSON`
-    );
+    const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/description/JSON`);
     if (res.ok) {
       const data = await res.json();
       const infos = data?.InformationList?.Information;
       if (infos) {
-        const found = infos.find(i => i.Description && i.Description.length > 60);
-        if (found) {
-          return found.Description.length > 500
-            ? found.Description.substring(0, 500) + '...'
-            : found.Description;
-        }
+        const found = infos.find(i => i.Description?.length > 60);
+        if (found) return found.Description.length > 500
+          ? found.Description.substring(0, 500) + '...' : found.Description;
       }
     }
-  } catch (e) { console.log('설명 조회 실패 (정상)'); }
+  } catch (e) {}
   return '';
+}
+
+// ─────────────────────────────────────────────
+// UI 업데이트
+// ─────────────────────────────────────────────
+function showBadge(ko, en, source) {
+  const badge = document.getElementById('translateBadge');
+  const icon = source === 'ai' ? '🤖 AI 번역' : '📖 사전';
+  badge.innerHTML = `${icon}: <span>"${ko}"</span> → <span>"${en}"</span>으로 검색합니다`;
+  badge.style.display = 'block';
+}
+function hideBadge() {
+  document.getElementById('translateBadge').style.display = 'none';
 }
 
 function updateUI(query, props, desc, cid) {
@@ -350,8 +611,7 @@ function updateUI(query, props, desc, cid) {
 
   if (desc) {
     document.getElementById('molDesc').textContent = desc;
-    document.getElementById('pubchemLink').href =
-      `https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`;
+    document.getElementById('pubchemLink').href = `https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`;
     showCard('descCard');
   }
 
@@ -360,68 +620,43 @@ function updateUI(query, props, desc, cid) {
   showCard('propCard');
 }
 
-// ⭐⭐⭐ 핵심 수정: placeholder를 삭제하지 않고 숨기기만! ⭐⭐⭐
+// ─────────────────────────────────────────────
+// 3D 렌더링
+// ─────────────────────────────────────────────
 function render3D(sdfData) {
   try {
-    // 기존 뷰어 참조만 끊기 (clear() 호출 금지 — DOM 파괴 원인)
     viewer = null;
-
     const element = document.getElementById('viewer');
-
-    // mol-container 통째로 제거 (canvas, WebGL 컨텍스트 포함)
     element.querySelectorAll('.mol-container').forEach(el => el.remove());
-
-    // placeholder 숨기기
     const placeholder = document.getElementById('placeholder');
     if (placeholder) placeholder.style.display = 'none';
 
-    // 새 컨테이너 생성
     const molContainer = document.createElement('div');
     molContainer.className = 'mol-container';
     element.appendChild(molContainer);
 
-    // DOM이 완전히 업데이트된 후 뷰어 생성
     requestAnimationFrame(() => {
-      viewer = $3Dmol.createViewer(molContainer, {
-        backgroundColor: 'black',
-        antialias: true
-      });
-
+      viewer = $3Dmol.createViewer(molContainer, { backgroundColor: 'black', antialias: true });
       viewer.addModel(sdfData, 'sdf');
       applyStyle(currentStyle);
       viewer.zoomTo();
       viewer.render();
       viewer.spin('y', 0.5);
-
       document.getElementById('styleBtns').style.display = 'flex';
-      console.log('✓ 3D 렌더링 완료');
     });
-
   } catch (err) {
-    console.error('렌더링 오류:', err);
     showError('3D 렌더링 실패: ' + err.message);
   }
 }
+
 function applyStyle(style) {
   if (!viewer) return;
   viewer.setStyle({}, {});
-
   switch(style) {
-    case 'stick':
-      viewer.setStyle({}, { stick: { radius: 0.15 } });
-      break;
-    case 'ball':
-      viewer.setStyle({}, {
-        stick: { radius: 0.1 },
-        sphere: { scale: 0.3 }
-      });
-      break;
-    case 'sphere':
-      viewer.setStyle({}, { sphere: { scale: 0.8 } });
-      break;
-    case 'line':
-      viewer.setStyle({}, { line: { linewidth: 2 } });
-      break;
+    case 'stick':   viewer.setStyle({}, { stick: { radius: 0.15 } }); break;
+    case 'ball':    viewer.setStyle({}, { stick: { radius: 0.1 }, sphere: { scale: 0.3 } }); break;
+    case 'sphere':  viewer.setStyle({}, { sphere: { scale: 0.8 } }); break;
+    case 'line':    viewer.setStyle({}, { line: { linewidth: 2 } }); break;
   }
   viewer.render();
 }
@@ -435,24 +670,16 @@ function setStyle(style, btn) {
 
 function showCard(id) { document.getElementById(id).classList.remove('hidden'); }
 function hideCard(id) { document.getElementById(id).classList.add('hidden'); }
-function hideAllCards() {
-  ['welcomeCard', 'infoCard', 'propCard', 'descCard'].forEach(hideCard);
-}
+function hideAllCards() { ['welcomeCard','infoCard','propCard','descCard'].forEach(hideCard); }
 function showError(msg) {
   document.getElementById('errorContainer').innerHTML =
     `<div class="error">⚠ ${msg.replace(/\n/g, '<br>')}</div>`;
 }
-function clearError() {
-  document.getElementById('errorContainer').innerHTML = '';
-}
+function clearError() { document.getElementById('errorContainer').innerHTML = ''; }
 
 window.addEventListener('load', () => {
   document.getElementById('searchInput').focus();
-  if (typeof $3Dmol === 'undefined') {
-    showError('3Dmol.js 라이브러리를 불러올 수 없습니다.');
-  } else {
-    console.log('✓ 3Dmol.js 로드 완료');
-  }
+  if (typeof $3Dmol === 'undefined') showError('3Dmol.js 라이브러리를 불러올 수 없습니다.');
 });
 </script>
 </body>
