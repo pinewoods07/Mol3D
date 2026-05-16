@@ -31,8 +31,7 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
 .style-btn { padding: 5px 12px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
 .style-btn.active { border-color: #22d3ee; color: #22d3ee; }
 #viewer { position: relative; width: 100%; height: 500px; background: #000; }
-.placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #475569; pointer-events: none; }
-.placeholder.hidden { display: none; }
+.placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #475569; pointer-events: none; z-index: 1; }
 .info-section { display: flex; flex-direction: column; gap: 15px; }
 .info-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid rgba(34, 211, 238, 0.2); }
 .card-title { color: #22d3ee; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; }
@@ -49,6 +48,7 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
 .spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid #1e293b; border-top-color: #22d3ee; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hidden { display: none !important; }
+.mol-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
 </style>
 </head>
 <body>
@@ -178,9 +178,6 @@ function quickSearch(name) {
   searchMolecule();
 }
 
-// ============================================
-//   핵심: CID만 있어도 진행, 나머지는 부가정보
-// ============================================
 async function searchMolecule() {
   const query = document.getElementById('searchInput').value.trim();
   if (!query) return;
@@ -191,7 +188,6 @@ async function searchMolecule() {
   clearError();
 
   try {
-    // 1단계: CID 찾기 (필수)
     const cid = await fetchCID(query);
 
     if (!cid) {
@@ -206,7 +202,6 @@ async function searchMolecule() {
 
     console.log('✓ CID 찾음:', cid);
 
-    // 2단계: 3D 구조 가져오기 (필수)
     document.getElementById('loadingMsg').textContent = '3D 구조 로딩 중...';
     const sdfData = await fetch3DStructure(cid);
 
@@ -216,19 +211,15 @@ async function searchMolecule() {
 
     console.log('✓ 3D 구조 로딩 완료');
 
-    // 3단계: 속성 정보 (실패해도 OK)
     document.getElementById('loadingMsg').textContent = '속성 정보 로딩 중...';
     const properties = await fetchPropertiesSafely(cid);
     console.log('✓ 속성:', properties);
 
-    // 4단계: 설명 (실패해도 OK)
     const description = await fetchDescriptionSafely(cid);
 
-    // UI 업데이트
     hideCard('loadingCard');
     updateUI(query, properties, description, cid);
 
-    // 3D 렌더링
     setTimeout(() => { render3D(sdfData); }, 100);
 
   } catch (err) {
@@ -238,13 +229,9 @@ async function searchMolecule() {
   }
 }
 
-// ============================================
-//   CID 찾기 - 가장 안정적인 엔드포인트
-// ============================================
 async function fetchCID(query) {
   const base = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound';
 
-  // 1. 이름으로 검색
   try {
     const res = await fetch(`${base}/name/${encodeURIComponent(query)}/cids/JSON`);
     if (res.ok) {
@@ -254,7 +241,6 @@ async function fetchCID(query) {
     }
   } catch (e) { console.log('이름 검색 실패:', e.message); }
 
-  // 2. 분자식으로 검색 (대문자로 변환)
   try {
     const formula = query.toUpperCase().replace(/\s+/g, '');
     const res = await fetch(`${base}/formula/${encodeURIComponent(formula)}/cids/JSON`);
@@ -268,14 +254,10 @@ async function fetchCID(query) {
   return null;
 }
 
-// ============================================
-//   속성 - 한 필드씩 따로따로 시도
-// ============================================
 async function fetchPropertiesSafely(cid) {
   const base = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property`;
   const result = {};
 
-  // 각 필드를 개별 요청 (하나가 실패해도 다른 거 진행)
   const fields = [
     'MolecularFormula',
     'MolecularWeight',
@@ -287,7 +269,6 @@ async function fetchPropertiesSafely(cid) {
     'RotatableBondCount'
   ];
 
-  // 병렬 요청
   const requests = fields.map(field =>
     fetch(`${base}/${field}/JSON`)
       .then(res => res.ok ? res.json() : null)
@@ -306,13 +287,9 @@ async function fetchPropertiesSafely(cid) {
   return result;
 }
 
-// ============================================
-//   3D 구조 조회
-// ============================================
 async function fetch3DStructure(cid) {
   const base = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}`;
 
-  // 3D 우선 시도
   try {
     const res = await fetch(`${base}/SDF?record_type=3d`);
     if (res.ok) {
@@ -321,7 +298,6 @@ async function fetch3DStructure(cid) {
     }
   } catch (e) { console.log('3D 실패:', e.message); }
 
-  // 2D 폴백
   try {
     const res = await fetch(`${base}/SDF`);
     if (res.ok) {
@@ -333,9 +309,6 @@ async function fetch3DStructure(cid) {
   return null;
 }
 
-// ============================================
-//   설명 조회 (안전하게)
-// ============================================
 async function fetchDescriptionSafely(cid) {
   try {
     const res = await fetch(
@@ -357,16 +330,12 @@ async function fetchDescriptionSafely(cid) {
   return '';
 }
 
-// ============================================
-//   UI 업데이트
-// ============================================
 function updateUI(query, props, desc, cid) {
   document.getElementById('molName').textContent = query;
   document.getElementById('molFormula').textContent = props.MolecularFormula || '—';
   document.getElementById('molIupac').textContent =
     props.IUPACName ? `IUPAC: ${props.IUPACName}` : `PubChem CID: ${cid}`;
 
-  // 분자량 안전 처리
   let mw = '—';
   if (props.MolecularWeight) {
     const val = parseFloat(props.MolecularWeight);
@@ -391,21 +360,34 @@ function updateUI(query, props, desc, cid) {
   showCard('propCard');
 }
 
-// ============================================
-//   3D 렌더링
-// ============================================
+// ⭐⭐⭐ 핵심 수정: placeholder를 삭제하지 않고 숨기기만! ⭐⭐⭐
 function render3D(sdfData) {
   try {
+    // 기존 뷰어 정리
     if (viewer) {
       try { viewer.clear(); } catch(e) {}
       viewer = null;
     }
 
-    document.getElementById('placeholder').classList.add('hidden');
     const element = document.getElementById('viewer');
-    element.innerHTML = '';
 
-    viewer = $3Dmol.createViewer(element, {
+    // placeholder 숨기기 (삭제 X)
+    const placeholder = document.getElementById('placeholder');
+    if (placeholder) {
+      placeholder.style.display = 'none';
+    }
+
+    // 기존 mol-container만 제거 (placeholder는 유지)
+    const oldContainer = element.querySelector('.mol-container');
+    if (oldContainer) oldContainer.remove();
+
+    // 3Dmol 전용 컨테이너 새로 만들기
+    const molContainer = document.createElement('div');
+    molContainer.className = 'mol-container';
+    element.appendChild(molContainer);
+
+    // 3Dmol 뷰어 생성
+    viewer = $3Dmol.createViewer(molContainer, {
       backgroundColor: 'black',
       antialias: true
     });
@@ -422,7 +404,6 @@ function render3D(sdfData) {
   } catch (err) {
     console.error('렌더링 오류:', err);
     showError('3D 렌더링 실패: ' + err.message);
-    document.getElementById('placeholder').classList.remove('hidden');
   }
 }
 
