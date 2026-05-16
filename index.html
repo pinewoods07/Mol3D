@@ -57,6 +57,11 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hidden { display: none !important; }
 .mol-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+.chem-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(34,211,238,0.1); }
+.chem-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.chem-label { font-size: 0.7rem; color: #22d3ee; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.chem-value { font-size: 0.85rem; color: #cbd5e1; line-height: 1.6; }
+.chem-highlight { color: #34d399; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -178,6 +183,15 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
         <a id="pubchemLink" target="_blank" style="display:inline-block;margin-top:10px;color:#22d3ee;font-size:0.8rem;text-decoration:none;">
           PubChem에서 더 보기 →
         </a>
+      </div>
+
+      <div class="info-card hidden" id="chemCard">
+        <div class="card-title">// 구조 분석</div>
+        <div id="chemLoading" class="loading" style="padding:15px;">
+          <div class="spinner"></div>
+          <div style="font-size:0.8rem;margin-top:6px;">분석 중...</div>
+        </div>
+        <div id="chemContent" class="hidden"></div>
       </div>
 
       <div id="errorContainer"></div>
@@ -618,6 +632,9 @@ function updateUI(query, props, desc, cid) {
   hideCard('welcomeCard');
   showCard('infoCard');
   showCard('propCard');
+
+  // 화학 구조 분석 비동기 호출
+  fetchChemAnalysis(query, props.MolecularFormula, props.IUPACName);
 }
 
 // ─────────────────────────────────────────────
@@ -641,7 +658,6 @@ function render3D(sdfData) {
       applyStyle(currentStyle);
       viewer.zoomTo();
       viewer.render();
-      viewer.spin('y', 0.5);
       document.getElementById('styleBtns').style.display = 'flex';
     });
   } catch (err) {
@@ -670,11 +686,89 @@ function setStyle(style, btn) {
 
 function showCard(id) { document.getElementById(id).classList.remove('hidden'); }
 function hideCard(id) { document.getElementById(id).classList.add('hidden'); }
-function hideAllCards() { ['welcomeCard','infoCard','propCard','descCard'].forEach(hideCard); }
+function hideAllCards() { ['welcomeCard','infoCard','propCard','descCard','chemCard'].forEach(hideCard); }
 function showError(msg) {
   document.getElementById('errorContainer').innerHTML =
     `<div class="error">⚠ ${msg.replace(/\n/g, '<br>')}</div>`;
 }
+// ─────────────────────────────────────────────
+// Claude API — 화학 구조 분석
+// ─────────────────────────────────────────────
+async function fetchChemAnalysis(molName, formula, iupac) {
+  showCard('chemCard');
+  document.getElementById('chemLoading').style.display = 'block';
+  document.getElementById('chemContent').classList.add('hidden');
+
+  const prompt = `다음 분자에 대해 화학적 구조 분석을 JSON 형식으로만 답해줘. 절대 JSON 이외의 텍스트를 출력하지 마.
+
+분자명: ${molName}
+분자식: ${formula || '알 수 없음'}
+IUPAC명: ${iupac || '알 수 없음'}
+
+다음 JSON 형식으로만 답해줘 (값이 없으면 null):
+{
+  "geometry": "분자 기하구조 (예: 굽은형, 정사면체형, 삼각평면형 등)",
+  "bondAngle": "주요 결합각 (예: 104.5°, 109.5° 등)",
+  "hybridization": "중심 원자의 혼성화 (예: sp3, sp2, sp 등)",
+  "polarity": "극성/무극성 여부와 이유 (1~2문장)",
+  "bondType": "결합의 종류 (단일, 이중, 삼중, 공유결합, 이온결합 등)",
+  "lonePairs": "중심 원자의 비공유 전자쌍 수 (숫자, 없으면 0)",
+  "intermolecular": "분자 간 힘의 종류 (예: 수소결합, 반데르발스 힘, 쌍극자-쌍극자 등)",
+  "funFact": "이 분자의 구조와 관련된 흥미로운 사실 1가지 (2문장 이내)"
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) throw new Error('API 오류');
+    const data = await res.json();
+    let text = data?.content?.[0]?.text?.trim() || '';
+    text = text.replace(/```json|```/g, '').trim();
+    const chem = JSON.parse(text);
+    renderChemCard(chem);
+  } catch (e) {
+    console.log('화학 분석 실패:', e.message);
+    document.getElementById('chemLoading').style.display = 'none';
+    document.getElementById('chemContent').innerHTML =
+      '<div style="font-size:0.8rem;color:#475569;">구조 분석을 불러올 수 없습니다.</div>';
+    document.getElementById('chemContent').classList.remove('hidden');
+  }
+}
+
+function renderChemCard(chem) {
+  const items = [
+    { label: '분자 기하구조', value: chem.geometry },
+    { label: '결합각', value: chem.bondAngle },
+    { label: '혼성 오비탈', value: chem.hybridization },
+    { label: '비공유 전자쌍', value: chem.lonePairs !== null ? `${chem.lonePairs}쌍` : null },
+    { label: '결합 종류', value: chem.bondType },
+    { label: '극성', value: chem.polarity },
+    { label: '분자 간 힘', value: chem.intermolecular },
+    { label: '알아두면 좋은 점', value: chem.funFact },
+  ];
+
+  const html = items
+    .filter(i => i.value !== null && i.value !== undefined && i.value !== '')
+    .map(i => `
+      <div class="chem-item">
+        <div class="chem-label">${i.label}</div>
+        <div class="chem-value">${i.value}</div>
+      </div>`)
+    .join('');
+
+  document.getElementById('chemLoading').style.display = 'none';
+  document.getElementById('chemContent').innerHTML = html;
+  document.getElementById('chemContent').classList.remove('hidden');
+}
+
 function clearError() { document.getElementById('errorContainer').innerHTML = ''; }
 
 window.addEventListener('load', () => {
