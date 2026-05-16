@@ -363,50 +363,45 @@ function updateUI(query, props, desc, cid) {
 // ⭐⭐⭐ 핵심 수정: placeholder를 삭제하지 않고 숨기기만! ⭐⭐⭐
 function render3D(sdfData) {
   try {
-    // 기존 뷰어 정리
-    if (viewer) {
-      try { viewer.clear(); } catch(e) {}
-      viewer = null;
-    }
+    // 기존 뷰어 참조만 끊기 (clear() 호출 금지 — DOM 파괴 원인)
+    viewer = null;
 
     const element = document.getElementById('viewer');
 
-    // placeholder 숨기기 (삭제 X)
+    // mol-container 통째로 제거 (canvas, WebGL 컨텍스트 포함)
+    element.querySelectorAll('.mol-container').forEach(el => el.remove());
+
+    // placeholder 숨기기
     const placeholder = document.getElementById('placeholder');
-    if (placeholder) {
-      placeholder.style.display = 'none';
-    }
+    if (placeholder) placeholder.style.display = 'none';
 
-    // 기존 mol-container만 제거 (placeholder는 유지)
-    const oldContainer = element.querySelector('.mol-container');
-    if (oldContainer) oldContainer.remove();
-
-    // 3Dmol 전용 컨테이너 새로 만들기
+    // 새 컨테이너 생성
     const molContainer = document.createElement('div');
     molContainer.className = 'mol-container';
     element.appendChild(molContainer);
 
-    // 3Dmol 뷰어 생성
-    viewer = $3Dmol.createViewer(molContainer, {
-      backgroundColor: 'black',
-      antialias: true
+    // DOM이 완전히 업데이트된 후 뷰어 생성
+    requestAnimationFrame(() => {
+      viewer = $3Dmol.createViewer(molContainer, {
+        backgroundColor: 'black',
+        antialias: true
+      });
+
+      viewer.addModel(sdfData, 'sdf');
+      applyStyle(currentStyle);
+      viewer.zoomTo();
+      viewer.render();
+      viewer.spin('y', 0.5);
+
+      document.getElementById('styleBtns').style.display = 'flex';
+      console.log('✓ 3D 렌더링 완료');
     });
 
-    viewer.addModel(sdfData, 'sdf');
-    applyStyle(currentStyle);
-    viewer.zoomTo();
-    viewer.render();
-    viewer.zoom(1.2, 1000);
-    viewer.spin('y', 0.5);
-
-    document.getElementById('styleBtns').style.display = 'flex';
-    console.log('✓ 3D 렌더링 완료');
   } catch (err) {
     console.error('렌더링 오류:', err);
     showError('3D 렌더링 실패: ' + err.message);
   }
 }
-
 function applyStyle(style) {
   if (!viewer) return;
   viewer.setStyle({}, {});
