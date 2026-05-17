@@ -27,13 +27,7 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
 .preset-btn { padding: 6px 14px; background: transparent; border: 1px solid #475569; color: #94a3b8; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
 .preset-btn:hover { border-color: #22d3ee; color: #22d3ee; }
 
-/* ── 뷰어 영역: 3D + 2D 나란히 ── */
-.viewer-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-}
+.viewer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
 @media (max-width: 900px) { .viewer-row { grid-template-columns: 1fr; } }
 
 .viewer-section { background: #1e293b; border-radius: 12px; overflow: hidden; border: 1px solid rgba(34,211,238,0.2); }
@@ -47,19 +41,14 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
 .placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #475569; pointer-events: none; z-index: 1; }
 .mol-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
 
-/* 2D 뷰어 */
-#viewer2d { width: 100%; height: 460px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
-.placeholder2d { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #475569; width: 100%; height: 100%; }
-#structure2d-img { max-width: 100%; max-height: 420px; border-radius: 4px; display: none; }
+/* 2D 캔버스 */
+#canvas2d-wrap { width: 100%; height: 460px; background: #030a14; display: flex; align-items: center; justify-content: center; position: relative; }
+#canvas2d { display: block; }
+.placeholder2d { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #475569; }
 
-/* ── 하단 정보 그리드 ── */
-.info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-}
+.info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 @media (max-width: 1100px) { .info-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 700px) { .info-grid { grid-template-columns: 1fr; } }
+@media (max-width: 700px)  { .info-grid { grid-template-columns: 1fr; } }
 
 .info-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid rgba(34,211,238,0.2); }
 .card-title { color: #22d3ee; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; }
@@ -72,12 +61,10 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
 .prop-value { font-size: 1rem; font-weight: bold; color: #34d399; }
 .description { font-size: 0.85rem; color: #cbd5e1; line-height: 1.7; }
 
-/* 원소 범례 */
 .atom-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
 .atom-tag { display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
 .atom-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 
-/* 결합각 카드 */
 .bond-list { display: flex; flex-direction: column; gap: 10px; }
 .bond-item { background: #0f172a; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
 .bond-name { font-size: 0.82rem; color: #94a3b8; }
@@ -125,17 +112,16 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
     <button class="preset-btn" onclick="quickSearch('아드레날린')">아드레날린</button>
   </div>
 
-  <!-- 3D 뷰어 + 2D 구조식 나란히 -->
   <div class="viewer-row">
-    <!-- 3D 뷰어 -->
+    <!-- 3D -->
     <div class="viewer-section">
       <div class="viewer-header">
         <div class="viewer-title">// 3D 구조</div>
         <div class="style-btns" id="styleBtns" style="display:none;">
-          <button class="style-btn active" onclick="setStyle('stick', this)">막대</button>
-          <button class="style-btn" onclick="setStyle('ball', this)">볼-막대</button>
-          <button class="style-btn" onclick="setStyle('sphere', this)">구형</button>
-          <button class="style-btn" onclick="setStyle('line', this)">선</button>
+          <button class="style-btn active" onclick="setStyle('stick',this)">막대</button>
+          <button class="style-btn" onclick="setStyle('ball',this)">볼-막대</button>
+          <button class="style-btn" onclick="setStyle('sphere',this)">구형</button>
+          <button class="style-btn" onclick="setStyle('line',this)">선</button>
         </div>
       </div>
       <div id="viewer">
@@ -147,18 +133,18 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
       </div>
     </div>
 
-    <!-- 2D 구조식 -->
+    <!-- 2D 캔버스 -->
     <div class="viewer-section">
       <div class="viewer-header">
         <div class="viewer-title">// 2D 구조식</div>
-        <div style="font-size:0.7rem;color:#475569;">원소 색상 범례 포함</div>
+        <div style="font-size:0.7rem;color:#475569;">수소 원자 전부 표시</div>
       </div>
-      <div id="viewer2d">
+      <div id="canvas2d-wrap">
         <div class="placeholder2d" id="placeholder2d">
           <div style="font-size:3rem;opacity:0.2;">⬡</div>
-          <div style="margin-top:10px;font-size:0.9rem;color:#475569;">검색하면 구조식이 표시됩니다</div>
+          <div style="margin-top:10px;font-size:0.9rem;">검색하면 구조식이 표시됩니다</div>
         </div>
-        <img id="structure2d-img" alt="2D 구조식" />
+        <canvas id="canvas2d" width="460" height="460"></canvas>
       </div>
     </div>
   </div>
@@ -166,31 +152,21 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
   <!-- 하단 정보 -->
   <div id="infoArea" class="hidden">
     <div class="info-grid">
-
-      <!-- 기본 정보 -->
       <div class="info-card">
         <div class="card-title">// 기본 정보</div>
         <div class="mol-name" id="molName"></div>
         <div class="mol-formula" id="molFormula"></div>
         <div class="mol-info" id="molIupac"></div>
       </div>
-
-      <!-- 원소 구성 -->
       <div class="info-card">
         <div class="card-title">// 원소 구성</div>
         <div class="atom-legend" id="atomLegend"></div>
         <div id="atomDetail" style="font-size:0.8rem;color:#94a3b8;line-height:1.8;"></div>
       </div>
-
-      <!-- 결합각 & 기하구조 -->
       <div class="info-card">
         <div class="card-title">// 결합각 & 기하구조</div>
-        <div class="bond-list" id="bondList">
-          <div style="color:#475569;font-size:0.8rem;">검색하면 표시됩니다</div>
-        </div>
+        <div class="bond-list" id="bondList"></div>
       </div>
-
-      <!-- 물리화학적 특성 -->
       <div class="info-card">
         <div class="card-title">// 물리화학적 특성</div>
         <div class="prop-grid">
@@ -202,23 +178,16 @@ h1 { font-size: 2.2rem; color: #22d3ee; margin-bottom: 8px; }
           <div class="prop-item"><div class="prop-label">회전가능결합</div><div class="prop-value" id="propRotB">—</div></div>
         </div>
       </div>
-
-      <!-- 설명 -->
-      <div class="info-card" id="descCard" style="grid-column: span 2;">
+      <div class="info-card" id="descCard" style="grid-column:span 2;">
         <div class="card-title">// 설명</div>
         <div class="description" id="molDesc"></div>
         <a id="pubchemLink" target="_blank" style="display:inline-block;margin-top:10px;color:#22d3ee;font-size:0.8rem;text-decoration:none;">PubChem에서 더 보기 →</a>
       </div>
-
     </div>
   </div>
 
-  <!-- 로딩/에러 -->
   <div class="info-card hidden" id="loadingCard" style="max-width:400px;margin:20px auto;">
-    <div class="loading">
-      <div class="spinner"></div>
-      <div id="loadingMsg">분자 검색 중...</div>
-    </div>
+    <div class="loading"><div class="spinner"></div><div id="loadingMsg">분자 검색 중...</div></div>
   </div>
   <div id="errorContainer"></div>
 </div>
@@ -238,174 +207,144 @@ const KO_DICT = {
   '메탄':'methane','에탄':'ethane','프로판':'propane','부탄':'butane',
   '에틸렌':'ethylene','아세틸렌':'acetylene','벤젠':'benzene','톨루엔':'toluene',
   '나프탈렌':'naphthalene','사이클로헥산':'cyclohexane',
-  '에탄올':'ethanol','메탄올':'methanol','글리세롤':'glycerol','글리세린':'glycerin',
+  '에탄올':'ethanol','메탄올':'methanol','글리세롤':'glycerol',
   '아세트산':'acetic acid','초산':'acetic acid','구연산':'citric acid','젖산':'lactic acid',
-  '살리실산':'salicylic acid','안식향산':'benzoic acid',
-  '황산':'sulfuric acid','염산':'hydrochloric acid','질산':'nitric acid','인산':'phosphoric acid',
-  '포도당':'glucose','글루코스':'glucose','과당':'fructose','설탕':'sucrose','유당':'lactose',
-  '글리신':'glycine','알라닌':'alanine','페닐알라닌':'phenylalanine','트립토판':'tryptophan',
+  '살리실산':'salicylic acid','황산':'sulfuric acid','염산':'hydrochloric acid',
+  '포도당':'glucose','설탕':'sucrose','유당':'lactose','과당':'fructose',
   '비타민C':'ascorbic acid','비타민A':'retinol','비타민D':'cholecalciferol','비타민E':'tocopherol',
-  '아스피린':'aspirin','이부프로펜':'ibuprofen','파라세타몰':'paracetamol','아세트아미노펜':'acetaminophen',
+  '아스피린':'aspirin','이부프로펜':'ibuprofen','아세트아미노펜':'acetaminophen','타이레놀':'acetaminophen',
   '카페인':'caffeine','니코틴':'nicotine','콜레스테롤':'cholesterol','도파민':'dopamine',
   '세로토닌':'serotonin','아드레날린':'adrenaline','에피네프린':'epinephrine',
   '멜라토닌':'melatonin','테스토스테론':'testosterone','에스트로겐':'estrogen',
   '코르티솔':'cortisol','인슐린':'insulin','옥시토신':'oxytocin',
   '아세틸콜린':'acetylcholine','히스타민':'histamine','페니실린':'penicillin',
   '아세톤':'acetone','포름알데히드':'formaldehyde','클로로포름':'chloroform',
-  '바닐린':'vanillin','멘톨':'menthol','캡사이신':'capsaicin','리모넨':'limonene',
-  '베타카로틴':'beta-carotene','클로로필':'chlorophyll','인디고':'indigo',
+  '바닐린':'vanillin','멘톨':'menthol','캡사이신':'capsaicin',
   '소금':'sodium chloride','염화나트륨':'sodium chloride',
-  '탄산나트륨':'sodium carbonate','베이킹소다':'sodium bicarbonate',
-  '수산화나트륨':'sodium hydroxide','황산구리':'copper sulfate',
-  '산화칼슘':'calcium oxide','탄산칼슘':'calcium carbonate',
-  '황':'sulfur','탄소':'carbon','다이아몬드':'diamond','흑연':'graphite',
-  '요소':'urea','아닐린':'aniline','스티렌':'styrene',
+  '베이킹소다':'sodium bicarbonate','수산화나트륨':'sodium hydroxide',
+  '탄소':'carbon','황':'sulfur','요소':'urea',
   '아데닌':'adenine','구아닌':'guanine','시토신':'cytosine','티민':'thymine','우라실':'uracil',
 };
 
-// ─── 원소 색상 (Jmol 기준) ───
+// ─── 원소 색상 (사진처럼 cyan/teal 계열) ───
 const ATOM_COLORS = {
-  'H':'#ffffff','C':'#909090','N':'#3050f8','O':'#ff4040',
-  'S':'#ffff30','P':'#ff8000','F':'#90e050','Cl':'#1ff01f',
-  'Br':'#a62929','I':'#940094','Na':'#ab5cf2','Ca':'#3dff00',
-  'Fe':'#e06633','Mg':'#8aff00','Zn':'#7d80b0','K':'#8f40d4',
-  'DEFAULT':'#cccccc'
+  'H': '#a0e8ff',   // 연한 하늘
+  'C': '#22d3ee',   // cyan
+  'N': '#a78bfa',   // 보라
+  'O': '#f87171',   // 빨강
+  'S': '#fbbf24',   // 노랑
+  'P': '#fb923c',   // 주황
+  'F': '#86efac',   // 연두
+  'Cl':'#4ade80',   // 초록
+  'Br':'#f97316',   // 주황
+  'I': '#c084fc',   // 보라
+  'Na':'#60a5fa',   // 파랑
+  'Ca':'#34d399',   // 민트
+  'DEFAULT':'#94a3b8'
 };
 
-// ─── 결합각 데이터베이스 ───
+// ─── 결합각 DB ───
 const BOND_ANGLE_DB = {
-  // 분자명(소문자) → 결합각 정보
-  'water':            [{ name:'H-O-H', angle:'104.5°', shape:'굽은형 (bent)', hyb:'sp³' }],
-  'h2o':              [{ name:'H-O-H', angle:'104.5°', shape:'굽은형 (bent)', hyb:'sp³' }],
-  'ammonia':          [{ name:'H-N-H', angle:'107.3°', shape:'삼각뿔형 (trigonal pyramidal)', hyb:'sp³' }],
-  'nh3':              [{ name:'H-N-H', angle:'107.3°', shape:'삼각뿔형 (trigonal pyramidal)', hyb:'sp³' }],
-  'methane':          [{ name:'H-C-H', angle:'109.5°', shape:'정사면체형 (tetrahedral)', hyb:'sp³' }],
-  'ch4':              [{ name:'H-C-H', angle:'109.5°', shape:'정사면체형 (tetrahedral)', hyb:'sp³' }],
-  'carbon dioxide':   [{ name:'O-C-O', angle:'180°', shape:'선형 (linear)', hyb:'sp' }],
-  'co2':              [{ name:'O-C-O', angle:'180°', shape:'선형 (linear)', hyb:'sp' }],
-  'oxygen':           [{ name:'O=O', angle:'—', shape:'이원자 분자', hyb:'sp²' }],
-  'o2':               [{ name:'O=O', angle:'—', shape:'이원자 분자', hyb:'sp²' }],
-  'hydrogen':         [{ name:'H-H', angle:'—', shape:'이원자 분자', hyb:'s' }],
-  'nitrogen':         [{ name:'N≡N', angle:'—', shape:'이원자 분자', hyb:'sp' }],
-  'chlorine':         [{ name:'Cl-Cl', angle:'—', shape:'이원자 분자', hyb:'sp³' }],
-  'hydrogen chloride':[{ name:'H-Cl', angle:'—', shape:'이원자 분자', hyb:'sp³' }],
-  'hydrogen sulfide': [{ name:'H-S-H', angle:'92°', shape:'굽은형 (bent)', hyb:'sp³' }],
-  'sulfur dioxide':   [{ name:'O-S-O', angle:'119°', shape:'굽은형 (bent)', hyb:'sp²' }],
-  'hydrogen peroxide':[{ name:'H-O-O', angle:'96.8°', shape:'굽은형 (bent)', hyb:'sp³' }, { name:'O-O-H', angle:'96.8°', shape:'굽은형 (bent)', hyb:'sp³' }],
-  'ozone':            [{ name:'O-O-O', angle:'116.8°', shape:'굽은형 (bent)', hyb:'sp²' }],
-  'ethylene':         [{ name:'H-C-H', angle:'117.4°', shape:'삼각평면형', hyb:'sp²' }, { name:'C=C-H', angle:'121.3°', shape:'삼각평면형', hyb:'sp²' }],
-  'acetylene':        [{ name:'C≡C', angle:'180°', shape:'선형 (linear)', hyb:'sp' }],
-  'benzene':          [{ name:'C-C-C', angle:'120°', shape:'삼각평면형 (aromatic)', hyb:'sp²' }, { name:'H-C-C', angle:'120°', shape:'삼각평면형', hyb:'sp²' }],
-  'methanol':         [{ name:'H-C-H', angle:'108.5°', shape:'정사면체형', hyb:'sp³' }, { name:'C-O-H', angle:'108.5°', shape:'굽은형', hyb:'sp³' }],
-  'ethanol':          [{ name:'H-C-H', angle:'109.5°', shape:'정사면체형', hyb:'sp³' }, { name:'C-O-H', angle:'108.5°', shape:'굽은형', hyb:'sp³' }],
-  'acetic acid':      [{ name:'H-C-H', angle:'109.5°', shape:'정사면체형', hyb:'sp³' }, { name:'C-C=O', angle:'120°', shape:'삼각평면형', hyb:'sp²' }],
-  'acetone':          [{ name:'C-C-C', angle:'116°', shape:'삼각평면형', hyb:'sp²' }, { name:'C=O', angle:'—', shape:'이중결합', hyb:'sp²' }],
-  'formaldehyde':     [{ name:'H-C-H', angle:'116.5°', shape:'삼각평면형', hyb:'sp²' }, { name:'H-C=O', angle:'121.8°', shape:'삼각평면형', hyb:'sp²' }],
-  'glucose':          [{ name:'C-C-C', angle:'109~111°', shape:'정사면체형 (고리형)', hyb:'sp³' }, { name:'C-O-H', angle:'~108°', shape:'굽은형', hyb:'sp³' }],
-  'aspirin':          [{ name:'C-C-C (벤젠링)', angle:'120°', shape:'삼각평면형', hyb:'sp²' }, { name:'C=O', angle:'—', shape:'카르보닐기', hyb:'sp²' }],
-  'caffeine':         [{ name:'C-N-C', angle:'~120°', shape:'삼각평면형', hyb:'sp²' }, { name:'C=O', angle:'—', shape:'카르보닐기', hyb:'sp²' }],
-  'dopamine':         [{ name:'벤젠링 C-C-C', angle:'120°', shape:'삼각평면형', hyb:'sp²' }, { name:'C-N-H', angle:'~109°', shape:'정사면체형', hyb:'sp³' }],
-  'cholesterol':      [{ name:'C-C-C', angle:'109~112°', shape:'정사면체형', hyb:'sp³' }],
-  'nicotine':         [{ name:'C-N-C (피리딘)', angle:'117°', shape:'삼각평면형', hyb:'sp²' }, { name:'C-N-C (피롤리딘)', angle:'~109°', shape:'정사면체형', hyb:'sp³' }],
-  'ascorbic acid':    [{ name:'C-O-H', angle:'~109°', shape:'굽은형', hyb:'sp³' }, { name:'C=C', angle:'—', shape:'이중결합 (sp²)', hyb:'sp²' }],
-  'urea':             [{ name:'N-C-N', angle:'118.6°', shape:'삼각평면형', hyb:'sp²' }, { name:'C=O', angle:'—', shape:'카르보닐기', hyb:'sp²' }],
-  'ibuprofen':        [{ name:'벤젠링 C-C-C', angle:'120°', shape:'삼각평면형', hyb:'sp²' }, { name:'C-C-C', angle:'~109°', shape:'정사면체형', hyb:'sp³' }],
-  'paracetamol':      [{ name:'벤젠링 C-C-C', angle:'120°', shape:'삼각평면형', hyb:'sp²' }, { name:'N-C=O', angle:'~120°', shape:'아마이드 평면', hyb:'sp²' }],
-  'sodium chloride':  [{ name:'Na-Cl', angle:'—', shape:'이온결합 결정', hyb:'—' }],
-  'sulfuric acid':    [{ name:'O-S-O', angle:'119°', shape:'사면체형', hyb:'sp³' }],
-  'nitric acid':      [{ name:'O-N-O', angle:'130°', shape:'삼각평면형', hyb:'sp²' }],
-  'phosphoric acid':  [{ name:'O-P-O', angle:'109.5°', shape:'사면체형', hyb:'sp³' }],
+  'water':           [{name:'H-O-H',angle:'104.5°',shape:'굽은형',hyb:'sp³'}],
+  'ammonia':         [{name:'H-N-H',angle:'107.3°',shape:'삼각뿔형',hyb:'sp³'}],
+  'methane':         [{name:'H-C-H',angle:'109.5°',shape:'정사면체형',hyb:'sp³'}],
+  'carbon dioxide':  [{name:'O-C-O',angle:'180°',shape:'선형',hyb:'sp'}],
+  'oxygen':          [{name:'O=O',angle:'—',shape:'이원자 분자',hyb:'sp²'}],
+  'nitrogen':        [{name:'N≡N',angle:'—',shape:'이원자 분자',hyb:'sp'}],
+  'hydrogen':        [{name:'H-H',angle:'—',shape:'이원자 분자',hyb:'s'}],
+  'ozone':           [{name:'O-O-O',angle:'116.8°',shape:'굽은형',hyb:'sp²'}],
+  'sulfur dioxide':  [{name:'O-S-O',angle:'119°',shape:'굽은형',hyb:'sp²'}],
+  'hydrogen sulfide':[{name:'H-S-H',angle:'92°',shape:'굽은형',hyb:'sp³'}],
+  'hydrogen peroxide':[{name:'H-O-O',angle:'96.8°',shape:'굽은형',hyb:'sp³'}],
+  'ethylene':        [{name:'H-C-H',angle:'117.4°',shape:'삼각평면형',hyb:'sp²'},{name:'C=C-H',angle:'121.3°',shape:'삼각평면형',hyb:'sp²'}],
+  'acetylene':       [{name:'H-C≡C',angle:'180°',shape:'선형',hyb:'sp'}],
+  'benzene':         [{name:'C-C-C',angle:'120°',shape:'삼각평면형',hyb:'sp²'}],
+  'methanol':        [{name:'H-C-H',angle:'108.5°',shape:'정사면체형',hyb:'sp³'},{name:'C-O-H',angle:'108.5°',shape:'굽은형',hyb:'sp³'}],
+  'ethanol':         [{name:'H-C-H',angle:'109.5°',shape:'정사면체형',hyb:'sp³'},{name:'C-O-H',angle:'108.5°',shape:'굽은형',hyb:'sp³'}],
+  'acetic acid':     [{name:'H-C-H',angle:'109.5°',shape:'정사면체형',hyb:'sp³'},{name:'C-C=O',angle:'120°',shape:'삼각평면형',hyb:'sp²'}],
+  'acetone':         [{name:'C-C=O',angle:'121°',shape:'삼각평면형',hyb:'sp²'}],
+  'formaldehyde':    [{name:'H-C-H',angle:'116.5°',shape:'삼각평면형',hyb:'sp²'}],
+  'glucose':         [{name:'C-C-C',angle:'109~111°',shape:'정사면체형',hyb:'sp³'}],
+  'aspirin':         [{name:'벤젠링 C-C-C',angle:'120°',shape:'삼각평면형',hyb:'sp²'},{name:'C=O',angle:'—',shape:'카르보닐기',hyb:'sp²'}],
+  'caffeine':        [{name:'C-N-C',angle:'~120°',shape:'삼각평면형',hyb:'sp²'},{name:'C=O',angle:'—',shape:'카르보닐기',hyb:'sp²'}],
+  'dopamine':        [{name:'벤젠링 C-C-C',angle:'120°',shape:'삼각평면형',hyb:'sp²'},{name:'C-N-H',angle:'~109°',shape:'정사면체형',hyb:'sp³'}],
+  'nicotine':        [{name:'피리딘 C-N-C',angle:'117°',shape:'삼각평면형',hyb:'sp²'},{name:'피롤리딘 C-N-C',angle:'~109°',shape:'정사면체형',hyb:'sp³'}],
+  'cholesterol':     [{name:'C-C-C',angle:'109~112°',shape:'정사면체형',hyb:'sp³'}],
+  'ascorbic acid':   [{name:'C-O-H',angle:'~109°',shape:'굽은형',hyb:'sp³'},{name:'C=C',angle:'—',shape:'이중결합',hyb:'sp²'}],
+  'urea':            [{name:'N-C-N',angle:'118.6°',shape:'삼각평면형',hyb:'sp²'}],
+  'adrenaline':      [{name:'벤젠링 C-C-C',angle:'120°',shape:'삼각평면형',hyb:'sp²'},{name:'C-N-H',angle:'~109°',shape:'정사면체형',hyb:'sp³'}],
 };
 
-function isKorean(text) {
-  return /[\uAC00-\uD7A3]/.test(text);
+function isKorean(t){ return /[\uAC00-\uD7A3]/.test(t); }
+
+async function translateToEnglish(ko){
+  const n=ko.trim();
+  if(KO_DICT[n]) return {en:KO_DICT[n],source:'dict'};
+  for(const k of Object.keys(KO_DICT)) if(k.toLowerCase()===n.toLowerCase()) return {en:KO_DICT[k],source:'dict'};
+  return {en:ko,source:'none'};
 }
 
-async function translateToEnglish(korean) {
-  const norm = korean.trim();
-  if (KO_DICT[norm]) return { en: KO_DICT[norm], source: 'dict' };
-  const noSpace = norm.replace(/\s+/g, '');
-  if (KO_DICT[noSpace]) return { en: KO_DICT[noSpace], source: 'dict' };
-  for (const k of Object.keys(KO_DICT)) {
-    if (k.toLowerCase() === norm.toLowerCase()) return { en: KO_DICT[k], source: 'dict' };
-  }
-  return { en: korean, source: 'none' };
-}
+function quickSearch(n){ document.getElementById('searchInput').value=n; searchMolecule(); }
 
-function quickSearch(name) {
-  document.getElementById('searchInput').value = name;
-  searchMolecule();
-}
-
-async function searchMolecule() {
-  const rawQuery = document.getElementById('searchInput').value.trim();
-  if (!rawQuery) return;
+async function searchMolecule(){
+  const rawQuery=document.getElementById('searchInput').value.trim();
+  if(!rawQuery) return;
 
   document.getElementById('infoArea').classList.add('hidden');
   showCard('loadingCard');
-  document.getElementById('loadingMsg').textContent = '분자 검색 중...';
-  clearError();
-  hideBadge();
-  reset2D();
+  document.getElementById('loadingMsg').textContent='분자 검색 중...';
+  clearError(); hideBadge(); resetCanvas();
 
-  let searchQuery = rawQuery;
-
-  if (isKorean(rawQuery)) {
-    document.getElementById('loadingMsg').textContent = '한국어 번역 중...';
-    const result = await translateToEnglish(rawQuery);
-    searchQuery = result.en;
-    showBadge(rawQuery, searchQuery, result.source);
+  let searchQuery=rawQuery;
+  if(isKorean(rawQuery)){
+    document.getElementById('loadingMsg').textContent='한국어 번역 중...';
+    const r=await translateToEnglish(rawQuery);
+    searchQuery=r.en;
+    showBadge(rawQuery,searchQuery,r.source);
   }
 
-  try {
-    const cid = await fetchCID(searchQuery);
-    if (!cid) {
-      const cidRaw = searchQuery !== rawQuery ? await fetchCID(rawQuery) : null;
-      if (!cidRaw) throw new Error(`"${rawQuery}"를 찾을 수 없습니다.\n\n💡 예: 물, 카페인, caffeine, aspirin`);
-      await loadMolecule(cidRaw, rawQuery, rawQuery);
-      return;
-    }
-    await loadMolecule(cid, rawQuery, searchQuery);
-  } catch (err) {
-    hideCard('loadingCard');
-    showError(err.message);
+  try{
+    let cid=await fetchCID(searchQuery);
+    if(!cid && searchQuery!==rawQuery) cid=await fetchCID(rawQuery);
+    if(!cid) throw new Error(`"${rawQuery}"를 찾을 수 없습니다.\n\n💡 예: 물, 카페인, aspirin`);
+    await loadMolecule(cid,rawQuery,searchQuery);
+  }catch(err){
+    hideCard('loadingCard'); showError(err.message);
   }
 }
 
-async function loadMolecule(cid, displayName, searchKey) {
-  document.getElementById('loadingMsg').textContent = '3D 구조 로딩 중...';
-  const sdfData = await fetch3DStructure(cid);
-  if (!sdfData) throw new Error('3D 구조 데이터를 가져올 수 없습니다.');
+async function loadMolecule(cid,displayName,searchKey){
+  document.getElementById('loadingMsg').textContent='3D 구조 로딩 중...';
+  const sdfData=await fetch3DStructure(cid);
+  if(!sdfData) throw new Error('3D 구조 데이터를 가져올 수 없습니다.');
 
-  document.getElementById('loadingMsg').textContent = '속성 정보 로딩 중...';
-  const props = await fetchPropertiesSafely(cid);
-  const desc  = await fetchDescriptionSafely(cid);
+  // 2D SDF 따로 가져오기 (수소 포함)
+  document.getElementById('loadingMsg').textContent='2D 구조식 로딩 중...';
+  const sdf2D=await fetch2DSDF(cid);
+
+  document.getElementById('loadingMsg').textContent='속성 정보 로딩 중...';
+  const props=await fetchPropertiesSafely(cid);
+  const desc=await fetchDescriptionSafely(cid);
 
   hideCard('loadingCard');
-  updateUI(displayName, props, desc, cid, searchKey);
-  setTimeout(() => { render3D(sdfData); }, 100);
-  load2DImage(cid);
+  updateUI(displayName,props,desc,cid,searchKey);
+  setTimeout(()=>{ render3D(sdfData); },100);
+  if(sdf2D) draw2DStructure(sdf2D);
 }
 
 // ─── API ───
-async function fetchCID(query) {
-  const base = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound';
-  try {
-    const r = await fetch(`${base}/name/${encodeURIComponent(query)}/cids/JSON`);
-    if (r.ok) { const d = await r.json(); const c = d?.IdentifierList?.CID; if (c?.length) return c[0]; }
-  } catch(e){}
-  try {
-    const r = await fetch(`${base}/formula/${encodeURIComponent(query.toUpperCase().replace(/\s/g,''))}/cids/JSON`);
-    if (r.ok) { const d = await r.json(); const c = d?.IdentifierList?.CID; if (c?.length) return c[0]; }
-  } catch(e){}
+async function fetchCID(q){
+  const base='https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound';
+  try{ const r=await fetch(`${base}/name/${encodeURIComponent(q)}/cids/JSON`); if(r.ok){const d=await r.json();const c=d?.IdentifierList?.CID;if(c?.length)return c[0];} }catch(e){}
+  try{ const r=await fetch(`${base}/formula/${encodeURIComponent(q.toUpperCase().replace(/\s/g,''))}/cids/JSON`); if(r.ok){const d=await r.json();const c=d?.IdentifierList?.CID;if(c?.length)return c[0];} }catch(e){}
   return null;
 }
 
-async function fetchPropertiesSafely(cid) {
-  const base = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property`;
-  const result = {};
-  const fields = ['MolecularFormula','MolecularWeight','IUPACName','XLogP','TPSA','HBondDonorCount','HBondAcceptorCount','RotatableBondCount'];
-  await Promise.all(fields.map(f =>
+async function fetchPropertiesSafely(cid){
+  const base=`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property`;
+  const result={};
+  const fields=['MolecularFormula','MolecularWeight','IUPACName','XLogP','TPSA','HBondDonorCount','HBondAcceptorCount','RotatableBondCount'];
+  await Promise.all(fields.map(f=>
     fetch(`${base}/${f}/JSON`).then(r=>r.ok?r.json():null).then(d=>{
       const p=d?.PropertyTable?.Properties?.[0]; if(p?.[f]!==undefined) result[f]=p[f];
     }).catch(()=>{})
@@ -413,191 +352,254 @@ async function fetchPropertiesSafely(cid) {
   return result;
 }
 
-async function fetch3DStructure(cid) {
-  const base = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}`;
-  try { const r=await fetch(`${base}/SDF?record_type=3d`); if(r.ok){const t=await r.text();if(t?.length>100)return t;} } catch(e){}
-  try { const r=await fetch(`${base}/SDF`); if(r.ok){const t=await r.text();if(t?.length>100)return t;} } catch(e){}
+async function fetch3DStructure(cid){
+  const base=`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}`;
+  try{ const r=await fetch(`${base}/SDF?record_type=3d`); if(r.ok){const t=await r.text();if(t?.length>100)return t;} }catch(e){}
+  try{ const r=await fetch(`${base}/SDF`); if(r.ok){const t=await r.text();if(t?.length>100)return t;} }catch(e){}
   return null;
 }
 
-async function fetchDescriptionSafely(cid) {
-  try {
+// 2D SDF (수소 포함)
+async function fetch2DSDF(cid){
+  try{
+    const r=await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/SDF?record_type=2d`);
+    if(r.ok){ const t=await r.text(); if(t?.length>50) return t; }
+  }catch(e){}
+  return null;
+}
+
+async function fetchDescriptionSafely(cid){
+  try{
     const r=await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/description/JSON`);
     if(r.ok){const d=await r.json();const i=d?.InformationList?.Information;if(i){const f=i.find(x=>x.Description?.length>60);if(f)return f.Description.length>500?f.Description.substring(0,500)+'...':f.Description;}}
-  } catch(e){}
+  }catch(e){}
   return '';
 }
 
-// 2D 이미지 (PubChem SVG)
-function load2DImage(cid) {
-  const img = document.getElementById('structure2d-img');
-  const ph  = document.getElementById('placeholder2d');
-  // PubChem 구조식 이미지 API
-  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/PNG?image_size=500x500&record_type=2d&image_type=png&notation=allatoms`;
-  img.onload = () => { img.style.display='block'; ph.style.display='none'; };
-  img.onerror = () => {
-    ph.innerHTML = '<div style="color:#475569;font-size:0.85rem;">2D 구조식을 불러올 수 없습니다</div>';
-  };
-  img.src = url;
+// ══════════════════════════════════════════════
+//   2D 구조식 직접 그리기 (SDF → Canvas)
+//   사진처럼 어두운 배경 + cyan/teal 선 + 컬러 원소
+// ══════════════════════════════════════════════
+function parseSDF(sdfText){
+  const lines = sdfText.split(/\r?\n/);
+  const atoms = [];
+  const bonds = [];
+
+  // 헤더 읽기
+  if(lines.length < 4) return {atoms,bonds};
+
+  const countLine = lines[3];
+  const numAtoms  = parseInt(countLine.substring(0,3).trim()) || 0;
+  const numBonds  = parseInt(countLine.substring(3,6).trim()) || 0;
+
+  // 원자
+  for(let i=0;i<numAtoms;i++){
+    const line = lines[4+i] || '';
+    const x    = parseFloat(line.substring(0,10).trim());
+    const y    = parseFloat(line.substring(10,20).trim());
+    const elem = line.substring(31,34).trim();
+    if(!isNaN(x) && !isNaN(y)) atoms.push({x, y, elem: elem||'?'});
+  }
+
+  // 결합
+  const bondStart = 4 + numAtoms;
+  for(let i=0;i<numBonds;i++){
+    const line  = lines[bondStart+i] || '';
+    const a1    = parseInt(line.substring(0,3).trim())-1;
+    const a2    = parseInt(line.substring(3,6).trim())-1;
+    const order = parseInt(line.substring(6,9).trim())||1;
+    if(!isNaN(a1) && !isNaN(a2)) bonds.push({a1,a2,order});
+  }
+
+  return {atoms,bonds};
 }
 
-function reset2D() {
-  const img = document.getElementById('structure2d-img');
-  const ph  = document.getElementById('placeholder2d');
-  img.style.display = 'none';
-  img.src = '';
-  ph.style.display = 'flex';
-  ph.innerHTML = `
-    <div style="font-size:3rem;opacity:0.2;">⬡</div>
-    <div style="margin-top:10px;font-size:0.9rem;color:#475569;">검색하면 구조식이 표시됩니다</div>
-  `;
+function draw2DStructure(sdfText){
+  const canvas  = document.getElementById('canvas2d');
+  const wrap    = document.getElementById('canvas2d-wrap');
+  const ph      = document.getElementById('placeholder2d');
+  const ctx     = canvas.getContext('2d');
+  const W       = wrap.clientWidth  || 460;
+  const H       = wrap.clientHeight || 460;
+  canvas.width  = W;
+  canvas.height = H;
+  ph.style.display = 'none';
+
+  const {atoms, bonds} = parseSDF(sdfText);
+  if(atoms.length === 0){ ph.style.display='flex'; return; }
+
+  // 좌표 정규화
+  const xs = atoms.map(a=>a.x);
+  const ys = atoms.map(a=>a.y);
+  const minX=Math.min(...xs), maxX=Math.max(...xs);
+  const minY=Math.min(...ys), maxY=Math.max(...ys);
+  const rangeX=maxX-minX||1, rangeY=maxY-minY||1;
+  const pad=60;
+  const scaleX=(W-pad*2)/rangeX;
+  const scaleY=(H-pad*2)/rangeY;
+  const scale=Math.min(scaleX,scaleY);
+  const offsetX=(W-(rangeX*scale))/2 - minX*scale;
+  const offsetY=(H-(rangeY*scale))/2 + maxY*scale;
+
+  function tx(x){ return x*scale + offsetX; }
+  function ty(y){ return -y*scale + offsetY; }
+
+  // 배경
+  ctx.fillStyle='#030a14';
+  ctx.fillRect(0,0,W,H);
+
+  // ─── 결합 그리기 ───
+  bonds.forEach(b=>{
+    const a1=atoms[b.a1], a2=atoms[b.a2];
+    if(!a1||!a2) return;
+    const x1=tx(a1.x), y1=ty(a1.y);
+    const x2=tx(a2.x), y2=ty(a2.y);
+
+    // 결합 색: 양 원자 색 평균 (기본 cyan)
+    const c1 = ATOM_COLORS[a1.elem]||ATOM_COLORS['DEFAULT'];
+    const c2 = ATOM_COLORS[a2.elem]||ATOM_COLORS['DEFAULT'];
+
+    ctx.strokeStyle='#22d3ee';
+    ctx.lineWidth = 2;
+    ctx.shadowColor='#22d3ee';
+    ctx.shadowBlur = 6;
+    ctx.lineCap='round';
+
+    if(b.order===1){
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    } else if(b.order===2){
+      // 이중결합: 평행선 2개
+      const dx=x2-x1, dy=y2-y1;
+      const len=Math.sqrt(dx*dx+dy*dy)||1;
+      const nx=(-dy/len)*3, ny=(dx/len)*3;
+      ctx.beginPath();
+      ctx.moveTo(x1+nx,y1+ny); ctx.lineTo(x2+nx,y2+ny); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x1-nx,y1-ny); ctx.lineTo(x2-nx,y2-ny); ctx.stroke();
+    } else if(b.order===3){
+      // 삼중결합
+      const dx=x2-x1, dy=y2-y1;
+      const len=Math.sqrt(dx*dx+dy*dy)||1;
+      const nx=(-dy/len)*4, ny=(dx/len)*4;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x1+nx,y1+ny); ctx.lineTo(x2+nx,y2+ny); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x1-nx,y1-ny); ctx.lineTo(x2-nx,y2-ny); ctx.stroke();
+    }
+    ctx.shadowBlur=0;
+  });
+
+  // ─── 원자 라벨 그리기 ───
+  atoms.forEach((a,idx)=>{
+    const x=tx(a.x), y=ty(a.y);
+    const color = ATOM_COLORS[a.elem]||ATOM_COLORS['DEFAULT'];
+    const fontSize = a.elem==='H' ? 11 : 14;
+
+    ctx.shadowColor=color;
+    ctx.shadowBlur=8;
+    ctx.fillStyle=color;
+    ctx.font=`bold ${fontSize}px 'Courier New', monospace`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(a.elem, x, y);
+    ctx.shadowBlur=0;
+  });
+}
+
+function resetCanvas(){
+  const canvas=document.getElementById('canvas2d');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  document.getElementById('placeholder2d').style.display='flex';
 }
 
 // ─── 원소 분석 ───
-function parseAtoms(formula) {
-  if (!formula) return {};
-  const result = {};
-  const regex = /([A-Z][a-z]?)(\d*)/g;
+function parseAtoms(formula){
+  if(!formula) return {};
+  const result={};
+  const regex=/([A-Z][a-z]?)(\d*)/g;
   let m;
-  while ((m = regex.exec(formula)) !== null) {
-    if (m[1]) {
-      const el = m[1];
-      const cnt = m[2] ? parseInt(m[2]) : 1;
-      result[el] = (result[el] || 0) + cnt;
-    }
+  while((m=regex.exec(formula))!==null){
+    if(m[1]){ const el=m[1]; const cnt=m[2]?parseInt(m[2]):1; result[el]=(result[el]||0)+cnt; }
   }
   return result;
 }
 
-function renderAtomLegend(formula) {
-  const atoms = parseAtoms(formula);
-  const legend = document.getElementById('atomLegend');
-  const detail = document.getElementById('atomDetail');
-  legend.innerHTML = '';
-  detail.innerHTML = '';
-
-  const total = Object.values(atoms).reduce((a,b)=>a+b, 0);
-
-  Object.entries(atoms).forEach(([el, cnt]) => {
-    const color = ATOM_COLORS[el] || ATOM_COLORS['DEFAULT'];
-    const pct = total > 0 ? ((cnt/total)*100).toFixed(1) : 0;
-
-    // 태그
-    const tag = document.createElement('div');
-    tag.className = 'atom-tag';
-    tag.style.background = color + '22';
-    tag.style.border = `1px solid ${color}55`;
-    tag.style.color = color;
-    tag.innerHTML = `<div class="atom-dot" style="background:${color};"></div>${el} <span style="opacity:0.7;font-weight:normal;margin-left:3px;">×${cnt}</span>`;
+function renderAtomLegend(formula){
+  const atoms=parseAtoms(formula);
+  const legend=document.getElementById('atomLegend');
+  const detail=document.getElementById('atomDetail');
+  legend.innerHTML=''; detail.innerHTML='';
+  const total=Object.values(atoms).reduce((a,b)=>a+b,0);
+  Object.entries(atoms).forEach(([el,cnt])=>{
+    const color=ATOM_COLORS[el]||ATOM_COLORS['DEFAULT'];
+    const pct=total>0?((cnt/total)*100).toFixed(1):0;
+    const tag=document.createElement('div');
+    tag.className='atom-tag';
+    tag.style.background=color+'22'; tag.style.border=`1px solid ${color}55`; tag.style.color=color;
+    tag.innerHTML=`<div class="atom-dot" style="background:${color};"></div>${el} <span style="opacity:0.7;font-weight:normal;margin-left:3px;">×${cnt}</span>`;
     legend.appendChild(tag);
-
-    // 상세
-    detail.innerHTML += `<div><span style="color:${color};font-weight:bold;">${el}</span> : ${cnt}개 (${pct}%)</div>`;
+    detail.innerHTML+=`<div><span style="color:${color};font-weight:bold;">${el}</span> : ${cnt}개 (${pct}%)</div>`;
   });
 }
 
-// ─── 결합각 표시 ───
-function renderBondAngles(searchKey) {
-  const key = searchKey.toLowerCase().trim();
-  const list = document.getElementById('bondList');
-
-  // DB에서 검색
-  let data = BOND_ANGLE_DB[key];
-  if (!data) {
-    // 부분 매칭
-    for (const k of Object.keys(BOND_ANGLE_DB)) {
-      if (key.includes(k) || k.includes(key)) {
-        data = BOND_ANGLE_DB[k];
-        break;
-      }
-    }
-  }
-
-  if (!data || data.length === 0) {
-    list.innerHTML = `<div style="font-size:0.8rem;color:#475569;line-height:1.6;">
-      이 분자의 결합각 데이터가 없습니다.<br>
-      <span style="color:#22d3ee;">일반 참고값:</span><br>
-      sp³ → 109.5° (정사면체)<br>
-      sp² → 120° (삼각평면)<br>
-      sp → 180° (선형)
-    </div>`;
+function renderBondAngles(searchKey){
+  const key=searchKey.toLowerCase().trim();
+  const list=document.getElementById('bondList');
+  let data=BOND_ANGLE_DB[key];
+  if(!data) for(const k of Object.keys(BOND_ANGLE_DB)) if(key.includes(k)||k.includes(key)){data=BOND_ANGLE_DB[k];break;}
+  if(!data||!data.length){
+    list.innerHTML=`<div style="font-size:0.8rem;color:#475569;line-height:1.6;">결합각 데이터 없음<br><span style="color:#22d3ee;">일반 참고:</span><br>sp³ → 109.5°<br>sp² → 120°<br>sp → 180°</div>`;
     return;
   }
-
-  list.innerHTML = data.map(b => `
-    <div class="bond-item">
-      <div>
-        <div class="bond-name">${b.name}</div>
-        <div class="bond-shape">${b.shape}<span class="bond-hyb">${b.hyb}</span></div>
-      </div>
-      <div class="bond-angle">${b.angle}</div>
-    </div>
-  `).join('');
+  list.innerHTML=data.map(b=>`<div class="bond-item"><div><div class="bond-name">${b.name}</div><div class="bond-shape">${b.shape}<span class="bond-hyb">${b.hyb}</span></div></div><div class="bond-angle">${b.angle}</div></div>`).join('');
 }
 
-// ─── UI 업데이트 ───
-function updateUI(displayName, props, desc, cid, searchKey) {
-  document.getElementById('molName').textContent = displayName;
-  document.getElementById('molFormula').textContent = props.MolecularFormula || '—';
-  document.getElementById('molIupac').textContent = props.IUPACName ? `IUPAC: ${props.IUPACName}` : `PubChem CID: ${cid}`;
-
-  let mw = '—';
-  if (props.MolecularWeight) { const v=parseFloat(props.MolecularWeight); if(!isNaN(v)) mw=v.toFixed(2); }
-  document.getElementById('propMW').textContent = mw;
-  document.getElementById('propLogP').textContent = props.XLogP ?? '—';
-  document.getElementById('propHBD').textContent = props.HBondDonorCount ?? '—';
-  document.getElementById('propHBA').textContent = props.HBondAcceptorCount ?? '—';
-  document.getElementById('propTPSA').textContent = props.TPSA ?? '—';
-  document.getElementById('propRotB').textContent = props.RotatableBondCount ?? '—';
-
-  if (desc) {
-    document.getElementById('molDesc').textContent = desc;
-    document.getElementById('pubchemLink').href = `https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`;
-    document.getElementById('descCard').style.display = 'block';
-  } else {
-    document.getElementById('descCard').style.display = 'none';
-  }
-
-  // 원소 구성
+// ─── UI ───
+function updateUI(displayName,props,desc,cid,searchKey){
+  document.getElementById('molName').textContent=displayName;
+  document.getElementById('molFormula').textContent=props.MolecularFormula||'—';
+  document.getElementById('molIupac').textContent=props.IUPACName?`IUPAC: ${props.IUPACName}`:`PubChem CID: ${cid}`;
+  let mw='—'; if(props.MolecularWeight){const v=parseFloat(props.MolecularWeight);if(!isNaN(v))mw=v.toFixed(2);}
+  document.getElementById('propMW').textContent=mw;
+  document.getElementById('propLogP').textContent=props.XLogP??'—';
+  document.getElementById('propHBD').textContent=props.HBondDonorCount??'—';
+  document.getElementById('propHBA').textContent=props.HBondAcceptorCount??'—';
+  document.getElementById('propTPSA').textContent=props.TPSA??'—';
+  document.getElementById('propRotB').textContent=props.RotatableBondCount??'—';
+  if(desc){document.getElementById('molDesc').textContent=desc;document.getElementById('pubchemLink').href=`https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`;document.getElementById('descCard').style.display='block';}
+  else document.getElementById('descCard').style.display='none';
   renderAtomLegend(props.MolecularFormula);
-
-  // 결합각
   renderBondAngles(searchKey);
-
   document.getElementById('infoArea').classList.remove('hidden');
 }
 
 // ─── 3D 렌더링 ───
-function render3D(sdfData) {
-  try {
-    viewer = null;
-    const element = document.getElementById('viewer');
+function render3D(sdfData){
+  try{
+    viewer=null;
+    const element=document.getElementById('viewer');
     element.querySelectorAll('.mol-container').forEach(el=>el.remove());
-    const ph = document.getElementById('placeholder');
-    if (ph) ph.style.display = 'none';
-
-    const mc = document.createElement('div');
-    mc.className = 'mol-container';
+    const ph=document.getElementById('placeholder');
+    if(ph) ph.style.display='none';
+    const mc=document.createElement('div');
+    mc.className='mol-container';
     element.appendChild(mc);
-
-    requestAnimationFrame(() => {
-      viewer = $3Dmol.createViewer(mc, { backgroundColor: 'black', antialias: true });
-      viewer.addModel(sdfData, 'sdf');
+    requestAnimationFrame(()=>{
+      viewer=$3Dmol.createViewer(mc,{backgroundColor:'black',antialias:true});
+      viewer.addModel(sdfData,'sdf');
       applyStyle(currentStyle);
-      viewer.zoomTo();
-      viewer.render();
-      viewer.spin('y', 0.5);
-      document.getElementById('styleBtns').style.display = 'flex';
+      viewer.zoomTo(); viewer.render(); viewer.spin('y',0.5);
+      document.getElementById('styleBtns').style.display='flex';
     });
-  } catch(err) {
-    showError('3D 렌더링 실패: ' + err.message);
-  }
+  }catch(err){ showError('3D 렌더링 실패: '+err.message); }
 }
 
-function applyStyle(style) {
-  if (!viewer) return;
-  viewer.setStyle({}, {});
-  switch(style) {
+function applyStyle(style){
+  if(!viewer) return;
+  viewer.setStyle({},{});
+  switch(style){
     case 'stick':  viewer.setStyle({},{stick:{radius:0.15}}); break;
     case 'ball':   viewer.setStyle({},{stick:{radius:0.1},sphere:{scale:0.3}}); break;
     case 'sphere': viewer.setStyle({},{sphere:{scale:0.8}}); break;
@@ -606,31 +608,29 @@ function applyStyle(style) {
   viewer.render();
 }
 
-function setStyle(style, btn) {
-  currentStyle = style;
+function setStyle(style,btn){
+  currentStyle=style;
   document.querySelectorAll('.style-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  applyStyle(style);
+  btn.classList.add('active'); applyStyle(style);
 }
 
-function showCard(id) { document.getElementById(id)?.classList.remove('hidden'); }
-function hideCard(id) { document.getElementById(id)?.classList.add('hidden'); }
-function showBadge(ko, en, source) {
-  const badge = document.getElementById('translateBadge');
-  const icon = source==='ai'?'🤖 AI 번역':'📖 사전';
-  badge.innerHTML = `${icon}: <span>"${ko}"</span> → <span>"${en}"</span>`;
-  badge.style.display = 'block';
+function showCard(id){ document.getElementById(id)?.classList.remove('hidden'); }
+function hideCard(id){ document.getElementById(id)?.classList.add('hidden'); }
+function showBadge(ko,en,source){
+  const badge=document.getElementById('translateBadge');
+  badge.innerHTML=`📖 사전: <span>"${ko}"</span> → <span>"${en}"</span>`;
+  badge.style.display='block';
 }
-function hideBadge() { document.getElementById('translateBadge').style.display='none'; }
-function showError(msg) {
-  document.getElementById('errorContainer').innerHTML =
+function hideBadge(){ document.getElementById('translateBadge').style.display='none'; }
+function showError(msg){
+  document.getElementById('errorContainer').innerHTML=
     `<div class="error" style="max-width:600px;margin:20px auto;">⚠ ${msg.replace(/\n/g,'<br>')}</div>`;
 }
-function clearError() { document.getElementById('errorContainer').innerHTML=''; }
+function clearError(){ document.getElementById('errorContainer').innerHTML=''; }
 
-window.addEventListener('load', () => {
+window.addEventListener('load',()=>{
   document.getElementById('searchInput').focus();
-  if (typeof $3Dmol==='undefined') showError('3Dmol.js를 불러올 수 없습니다.');
+  if(typeof $3Dmol==='undefined') showError('3Dmol.js를 불러올 수 없습니다.');
 });
 </script>
 </body>
