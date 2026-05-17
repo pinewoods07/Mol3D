@@ -432,17 +432,11 @@ async function fetchDescriptionSafely(cid) {
 function load2DImage(cid) {
   const img = document.getElementById('structure2d-img');
   const ph  = document.getElementById('placeholder2d');
-
-  // 방법 1: SVG로 요청 (더 선명하고 수소 잘 표시됨)
-  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/SVG?image_size=large`;
-
-  img.onload = () => {
-    img.style.display = 'block';
-    ph.style.display  = 'none';
-  };
+  // PubChem 구조식 이미지 API
+  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/PNG?image_size=500x500&record_type=2d&image_type=png&notation=allatoms`;
+  img.onload = () => { img.style.display='block'; ph.style.display='none'; };
   img.onerror = () => {
-    // SVG 실패시 PNG 폴백
-    img.src = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/PNG?image_size=600x600`;
+    ph.innerHTML = '<div style="color:#475569;font-size:0.85rem;">2D 구조식을 불러올 수 없습니다</div>';
   };
   img.src = url;
 }
