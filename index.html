@@ -433,7 +433,7 @@ function load2DImage(cid) {
   const img = document.getElementById('structure2d-img');
   const ph  = document.getElementById('placeholder2d');
   // PubChem 구조식 이미지 API
-  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/PNG?image_size=400x400`;
+  const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/PNG?image_size=500x500&record_type=2d&image_type=png&notation=allatoms`;
   img.onload = () => { img.style.display='block'; ph.style.display='none'; };
   img.onerror = () => {
     ph.innerHTML = '<div style="color:#475569;font-size:0.85rem;">2D 구조식을 불러올 수 없습니다</div>';
